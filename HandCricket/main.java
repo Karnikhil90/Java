@@ -1,3 +1,5 @@
+// Update on 3rd - 4th January 2024
+
 package HandCricket;
 
 import java.util.*;
@@ -6,24 +8,26 @@ public class main {
 
     Scanner scanner = new Scanner(System.in);
 
-    // Global Variable
-    int player_score = 0;
-    int computer_score = 0;
+    // Variables For Scores & Winings
+    int PLAYER_WININGS = 0;
+    int COMPUTER_WININGS = 0;
+
+    final int over = 6;
     String player_name;
 
     public int computerRuns() { // Computer genrated outcomes 1 - 6
-        double n;
-        n = Math.random() * 7;
-        int a = (int) n;
-        return a;
+        int COMPUTER_RUNS = (int) (Math.random() * 7);
+        while (true) {
+            if (COMPUTER_RUNS != 0)
+                return COMPUTER_RUNS;
+            COMPUTER_RUNS = (int) (Math.random() * 7);
+        }
+
     }
 
-    public int computer_choice() {
-        double rnd = 0;
-        rnd = Math.random() * 100;
-        if ((int) rnd % 2 == 0)
-            return 0; // True
-        return 1; // False
+    // Computer genrated outcomes
+    public int AutoToss() {
+        return (int) (Math.random() * 1000) % 2 == 0 ? 1 : 0;
     }
 
     public void getPlayerInfo() {
@@ -34,17 +38,22 @@ public class main {
     }
 
     public void setupMatch() { // Who will get batting and bolling
-
-        double comp_OddEve = Math.random() * 100;
+        int ComputerToss = AutoToss();
 
         System.out.println("Odd or Even to decide Batting or bolling ");
         System.out.print("Entr ur value : ");
         int player_ch = scanner.nextInt();
 
-        int sum_of_OddEve = player_ch + (int) comp_OddEve;
+        while (true) {
+            if ((ComputerToss % 2 == player_ch % 2))
+                ComputerToss = AutoToss();
+            else
+                break;
+        }
+        int sum_of_OddEve = player_ch + ComputerToss;
         int oddEve = sum_of_OddEve % 2;
 
-        int temp = computer_choice();
+        int temp = AutoToss();
         System.out.println("Computer choice : " + temp);
 
         if (player_ch % 2 == oddEve) {
@@ -83,16 +92,17 @@ public class main {
 
     // Computer
     public void comp_batting(int target_score_of_computer) {
+        int PLAYER_SCORES = 0;
+        int COMPTER_SCORES = 0;
         // Comp -> batting
         // Player -> bolling
         int target = target_score_of_computer + 1;
-        int over = 6;
         int player_thrownRuns = 0, comp_thrownRuns = 0;
         System.out.println("\n\n_________________________________________________________\n\n");
-        System.out.println("It will be 2 overs match\n\t\tHere You Goooo!!! ");
+        System.out.println("It will be " + over + " overs match\n\t\tHere You Goooo!!! ");
 
         int i;
-        for (i = 0; i <= over; i++) {
+        for (i = 0; i <= 6 * over; i++) {
             System.out.println("Throw your ball(1 to 6): ");
             player_thrownRuns = scanner.nextInt();
             comp_thrownRuns = computerRuns();
@@ -101,14 +111,14 @@ public class main {
             if (player_thrownRuns <= 6) {
                 if (player_thrownRuns == comp_thrownRuns) {
                     System.out.println(player_name + "'s, Taken a wickte of computer ");
-                    System.out.println("Computer's, Your Total Score : " + computer_score);
+                    System.out.println("Computer's, Your Total Score : " + COMPTER_SCORES);
                     break;
                 } else {
-                    computer_score += comp_thrownRuns;
+                    COMPTER_SCORES += comp_thrownRuns;
                 }
 
                 if (target > 1) {
-                    if (target <= computer_score) {
+                    if (target <= COMPTER_SCORES) {
                         System.out.println("***Computer Won this***");
                         break;
                     }
@@ -127,16 +137,23 @@ public class main {
 
         }
         if (i <= 6) {
-            System.out.println("Match Just end !!  ");
+            System.out.println("\n\t****Match Just end !! ****  ");
         } else {
-            System.out.println("Computer's, Your Total Score : " + computer_score);
+            System.out.println("Computer's, Your Total Score : " + COMPTER_SCORES);
+            if (COMPTER_SCORES >= target) {
+                if (COMPTER_SCORES > 1)
+                    COMPUTER_WININGS++;
+                System.out.println("\tComputers Winings : " + COMPUTER_WININGS);
+            }
         }
         System.out.println("\n\n_________________________________________________________\n\n");
         System.out.println("Now That's " + player_name + "'s time to make runs ");
-        player_batting(computer_score);
+
+        player_batting(COMPTER_SCORES);
     }
 
     public void player_batting(int target_score_of_player) {
+        int PLAYER_SCORES = 0;
         // Player -> batting
         // Comp -> bolling
         int target = target_score_of_player + 1;
@@ -148,27 +165,27 @@ public class main {
             System.out.print("Target to match : " + target + '\n');
         }
 
-        System.out.println("It will be 2 overs match\n\t\tHere You Goooo!!! ");
+        System.out.println("It will be " + overs + " overs match\n\t\tHere You Goooo!!! ");
 
         int i;
-        for (i = 0; i <= overs * 1; i++) {
+        for (i = 0; i <= 6 * overs; i++) {
 
             comp_thrownRuns = computerRuns();
             System.out.print("Enter your thrown(1 to 6) : ");
             player_thrownRuns = scanner.nextInt();
 
             System.out.println("Computer thrown Runs : " + comp_thrownRuns);
-            if (player_thrownRuns <= 6) {
+            if (player_thrownRuns <= 6 && player_thrownRuns > 0) {
                 if (player_thrownRuns == comp_thrownRuns) {
                     System.out.println("Thats a Wicket " + player_name + ", just out");
-                    System.out.println(player_name + ", Your Total Score : " + player_score);
+                    System.out.println(player_name + ", Your Total Score : " + PLAYER_SCORES);
                     break;
                 } else {
-                    player_score += player_thrownRuns;
+                    PLAYER_SCORES += player_thrownRuns;
                 }
 
                 if (target > 1) {
-                    if (target <= player_score) {
+                    if (target <= PLAYER_SCORES) {
                         break;
                     }
                 }
@@ -183,22 +200,20 @@ public class main {
             }
         }
 
-        if (target <= player_score && target > 1) {
-            System.out.println("\n\n_________________________________________________________");
-            System.out.println("\n\n\t\t***You Win This Game***\n\n");
-            System.out.println(player_name + ", Your Total Score : " + player_score);
+        if (i <= 6) {
+            System.out.println("\n\t****Match Just end !! ****  ");
         } else {
-            if (target > 1 && i + 1 < 6) {
-                System.out.println("you cant win this game");
-                System.out.println(player_name + ", Your Total Score : " + player_score);
-
+            System.out.println(player_name + "'s, Your Total Score : " + PLAYER_SCORES);
+            if (PLAYER_SCORES >= target && target > 1) {
+                if (PLAYER_SCORES > 1)
+                    PLAYER_WININGS++;
+                System.out.println("\t" + player_name + "'s Winings : " + PLAYER_WININGS);
             }
         }
 
         System.out.println("\n\n_________________________________________________________\n\n");
         System.out.println("Now That's computer's time to make runs ");
-        comp_batting(player_score);
-
+        comp_batting(PLAYER_SCORES);
     }
 
     public static void main(String[] args) {
