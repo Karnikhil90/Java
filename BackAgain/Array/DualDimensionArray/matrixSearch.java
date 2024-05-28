@@ -1,4 +1,4 @@
-package BackAgain.Array.DualDimensionArray;
+package Array.DualDimensionArray;
 
 /**
  * matrixSearch

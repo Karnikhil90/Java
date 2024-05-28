@@ -1,3 +1,5 @@
+package Random;
+
 // Cheaking the frequency of a line 
 // 1.the space will be not counted 
 // 2. The capital,small letters will be calculated 
@@ -5,6 +7,7 @@
 // 4.the special also calculated
 // ----------------START----------------
 import java.util.Scanner;
+
 public class BigFrequency {
 
     Scanner input;
@@ -21,7 +24,8 @@ public class BigFrequency {
         return input.nextLine();
     }
 
-    // Method to process the input line and count the frequency of different character types
+    // Method to process the input line and count the frequency of different
+    // character types
     public void Process(String line) {
         int lengthOfLine = line.length();
 
