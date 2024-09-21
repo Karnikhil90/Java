@@ -1,225 +1,261 @@
-// Update on 3rd - 4th January 2024
+/**
+ * @since 30th December, 2023 
+ * @author Nikhil Karmakar
+ * @Licence MIT
+ * @version v2.0 
+ * 
+ * HandCricket [v2.0]: Hand Cricket in Java code...
+ * Explain :
+ * This project simulates a hand cricket match between a player and a computer. 
+ * It helps beginners learn Java through interactive gameplay, covering key concepts like 
+ * object-oriented programming, control structures, user input, and randomization. 
+ * Players can choose to bat or bowl, score runs, and play multiple matches, 
+ * making it an engaging way to practice coding skills.
+ * 
+ * Update :
+ * First Version (v1.0): Was very basic 
+ * v2.0 : Is same as early but now the flow & way of write code is changed.
+ * 
+ * Flow of the Program :
+ * 1. Ask for the player's name.
+ * 2. Call `setupMatch()` to initiate the game.
+ * 3. Handle the toss and determine who bats first.
+ * 4. Alternate between player and computer turns to score runs.
+ * 5. Display results after the match and ask if the player wants to play again.
+ * 
+ * 
+ * Code Flow & Explain funtions :
+ * 1. `getPlayerInfo()` : Prompts the user to enter their name.
+ * 2. `setupMatch()` : Initializes the match by determining the toss and setting up the batting/bowling order.
+ * 3. `playerBatting(int targetScore)` : Manages the player's batting turn, including score input and checking for outs.
+ * 4. `computerBatting(int targetScore)` : Handles the computer's batting turn, processing computer runs and outs.
+ * 5. `displayScores()` : Displays the scores at the end of the match and prompts the player to play again.
+ * 6. `askToPlayAgain()` : Asks the player if they want to play another game, restarting the match if they agree.
+ */
 
 package HandCricket;
 
-import java.util.*;
+import java.util.Scanner;
 
 public class main {
+    private Scanner scanner;
+    private int playerWins, computerWins;
+    private final int balls;
+    private final int over = 6;
+    private String playerName;
 
-    Scanner scanner = new Scanner(System.in);
-
-    // Variables For Scores & Winings
-    int PLAYER_WININGS = 0;
-    int COMPUTER_WININGS = 0;
-
-    final int over = 6;
-    String player_name;
-
-    public int computerRuns() { // Computer genrated outcomes 1 - 6
-        int COMPUTER_RUNS = (int) (Math.random() * 7);
-        while (true) {
-            if (COMPUTER_RUNS != 0)
-                return COMPUTER_RUNS;
-            COMPUTER_RUNS = (int) (Math.random() * 7);
-        }
-
+    // Constructor for initialization
+    public main() {
+        scanner = new Scanner(System.in);
+        playerWins = 0;
+        computerWins = 0;
+        balls = 1 * over; // Default match overs
     }
 
-    // Computer genrated outcomes
-    public int AutoToss() {
-        return (int) (Math.random() * 1000) % 2 == 0 ? 1 : 0;
+    // Generates random runs for the computer (1 to 6)
+    private int generateComputerRuns() {
+        int computerRuns;
+        do {
+            computerRuns = (int) (Math.random() * 7);
+        } while (computerRuns == 0); // Ensure run is between 1 and 6
+        return computerRuns;
     }
 
+    // Generates random toss (0 or 1)
+    private int generateToss() {
+        return (int) (Math.random() * 1000) % 2;
+    }
+
+    // Fetches player information
     public void getPlayerInfo() {
-        System.out.println("\n\n_________________________________________________________\n\n");
-        System.out.print("\tEntr ur player name : ");
-        player_name = scanner.next();
-        System.out.println("_________________________________________________________\n\n");
+        System.out.println("_________________________________________________________");
+        System.out.print("Enter your player name: ");
+        playerName = scanner.next();
+        System.out.println("_________________________________________________________\n");
     }
 
-    public void setupMatch() { // Who will get batting and bolling
-        int ComputerToss = AutoToss();
+    // Toss and setup for the match
+    public void setupMatch() {
+        int computerToss = generateToss();
 
-        System.out.println("Odd or Even to decide Batting or bolling ");
-        System.out.print("Entr ur value : ");
-        int player_ch = scanner.nextInt();
+        System.out.println("Odd or Even to decide batting or bowling.");
+        System.out.print("Enter your value (1 for Odd, 2 for Even): ");
+        int playerChoice = scanner.nextInt();
 
-        while (true) {
-            if ((ComputerToss % 2 == player_ch % 2))
-                ComputerToss = AutoToss();
-            else
+        // Keep generating toss until a decision is made
+        while (computerToss % 2 == playerChoice % 2) {
+            computerToss = generateToss();
+        }
+
+        int sum = playerChoice + computerToss;
+        boolean playerWonToss = (sum % 2 == playerChoice % 2);
+
+        if (playerWonToss) {
+            System.out.println("\nYou won the toss!");
+            System.out.println("1. Batting\n2. Bowling");
+            System.out.print("Enter your choice: ");
+            playerChoice = scanner.nextInt();
+
+            if (playerChoice == 1) {
+                playerBatting(0);
+            } else if (playerChoice == 2) {
+                computerBatting(0);
+            } else {
+                System.out.println("Error: Invalid choice.");
+            }
+
+        } else {
+            System.out.println("\nComputer won the toss!");
+            if (generateToss() == 0) {
+                System.out.println("Computer chose to bat.");
+                computerBatting(0);
+            } else {
+                System.out.println("Computer chose to bowl.");
+                playerBatting(0);
+            }
+        }
+    }
+
+    // Computer's batting turn
+    private void playerBatting(int targetScore) {
+        int playerScore = 0;
+        boolean isChasing = targetScore > 0; // Check if the player is chasing a target
+        int target = targetScore + 1;
+
+        if (isChasing) {
+            System.out.println("Your target is: " + target);
+        }
+
+        System.out.println("\nYou are batting!");
+        for (int i = 0; i < 6 * balls; i++) {
+            System.out.print("Enter your shot (1 to 6): ");
+            int playerThrownRuns = scanner.nextInt();
+
+            if (playerThrownRuns > 6 || playerThrownRuns < 1) {
+                System.out.println("Invalid input. Enter a number between 1 and 6.");
+                i--; // Skip current iteration due to invalid input
+                continue;
+            }
+
+            int compThrownRuns = generateComputerRuns();
+            System.out.println("Computer bowls: " + compThrownRuns);
+
+            // Out if the player's thrown runs equal the computer's thrown runs
+            if (playerThrownRuns == compThrownRuns) {
+                System.out.println("Wicket! You're out.");
                 break;
+            }
+
+            playerScore += playerThrownRuns;
+
+            // Check if the player wins when chasing
+            if (isChasing && playerScore >= target) {
+                System.out.println("You won the match!");
+                playerWins++;
+                displayScores();
+                return;
+            }
         }
-        int sum_of_OddEve = player_ch + ComputerToss;
-        int oddEve = sum_of_OddEve % 2;
 
-        int temp = AutoToss();
-        System.out.println("Computer choice : " + temp);
+        System.out.println(playerName + "'s total score: " + playerScore);
 
-        if (player_ch % 2 == oddEve) {
-            // Player Get the choice of batting or Bolling
-            System.out.println("\n\n_________________________________________________________\n");
-            System.out.println("\t\t***You win this***");
-            System.out.println("\t1. Batting \n\t2. Bolling");
-            System.out.print("Enter Your choice: ");
-            player_ch = scanner.nextInt();
-
-            if (player_ch == 1) {
-                System.out.println("\n\n_________________________________________________________\n");
-                player_batting(0);
-            } else if (player_ch == 2) {
-                System.out.println("\n\n_________________________________________________________\n");
-                comp_batting(0);
-            } else {
-                System.out.println("\n\n_________________________________________________________\n");
-                System.out.println("\t\t***Error : Input Out of list***");
-                System.out.println("\n\n_________________________________________________________\n");
-            }
-
+        // If this was the first innings, computer bats next
+        if (!isChasing) {
+            computerBatting(playerScore);
         } else {
-            System.out.println("\n\n_________________________________________________________\n");
-            System.out.println("***Computer win this***");
-            if (temp == 0) {
-                System.out.println("Computer had decided for Batting");
-                comp_batting(0);
-            } else {
-                System.out.println("Computer had decided for Bolling");
-                player_batting(0);
+            // If this was the second innings, display the final results
+            if (playerScore < target) {
+                System.out.println("Computer won the match!");
+                computerWins++;
             }
-            System.out.println("\n\n_________________________________________________________");
+            displayScores();
         }
     }
 
-    // Computer
-    public void comp_batting(int target_score_of_computer) {
-        int PLAYER_SCORES = 0;
-        int COMPTER_SCORES = 0;
-        // Comp -> batting
-        // Player -> bolling
-        int target = target_score_of_computer + 1;
-        int player_thrownRuns = 0, comp_thrownRuns = 0;
-        System.out.println("\n\n_________________________________________________________\n\n");
-        System.out.println("It will be " + over + " overs match\n\t\tHere You Goooo!!! ");
+    private void computerBatting(int targetScore) {
+        int computerScore = 0;
+        boolean isChasing = targetScore > 0; // Check if the computer is chasing a target
+        int target = targetScore + 1;
 
-        int i;
-        for (i = 0; i <= 6 * over; i++) {
-            System.out.println("Throw your ball(1 to 6): ");
-            player_thrownRuns = scanner.nextInt();
-            comp_thrownRuns = computerRuns();
-            System.out.println("Computer throw : " + comp_thrownRuns);
+        if (isChasing) {
+            System.out.println("Computer's target is: " + target);
+        }
 
-            if (player_thrownRuns <= 6) {
-                if (player_thrownRuns == comp_thrownRuns) {
-                    System.out.println(player_name + "'s, Taken a wickte of computer ");
-                    System.out.println("Computer's, Your Total Score : " + COMPTER_SCORES);
-                    break;
-                } else {
-                    COMPTER_SCORES += comp_thrownRuns;
-                }
+        System.out.println("\nComputer is batting!");
+        for (int i = 0; i < 6 * balls; i++) {
+            System.out.print("Throw your ball (1 to 6): ");
+            int playerThrownRuns = scanner.nextInt();
 
-                if (target > 1) {
-                    if (target <= COMPTER_SCORES) {
-                        System.out.println("***Computer Won this***");
-                        break;
-                    }
-
-                }
-
-            } else {
-                System.out.println("\n\n_________________________________________________________\n\n");
-                System.out.println("\t***Thats a foul*** \n\t\t ->computer get 2 runs ");
-                System.out.println("\n\n_________________________________________________________\n\n");
-                comp_thrownRuns += 2;
-                i--;
+            if (playerThrownRuns > 6 || playerThrownRuns < 1) {
+                System.out.println("Invalid input. Computer gets 2 extra runs.");
+                computerScore += 2;
                 continue;
-
             }
 
+            int compThrownRuns = generateComputerRuns();
+            System.out.println("Computer hits: " + compThrownRuns);
+
+            // Out if the computer's thrown runs equal the player's thrown runs
+            if (playerThrownRuns == compThrownRuns) {
+                System.out.println("Wicket! Computer is out.");
+                break;
+            }
+
+            computerScore += compThrownRuns;
+
+            // Check if the computer wins when chasing
+            if (isChasing && computerScore >= target) {
+                System.out.println("Computer won the match!");
+                computerWins++;
+                displayScores();
+                return;
+            }
         }
-        if (i <= 6) {
-            System.out.println("\n\t****Match Just end !! ****  ");
+
+        System.out.println("Computer's total score: " + computerScore);
+
+        // If this was the first innings, player bats next
+        if (!isChasing) {
+            playerBatting(computerScore);
         } else {
-            System.out.println("Computer's, Your Total Score : " + COMPTER_SCORES);
-            if (COMPTER_SCORES >= target) {
-                if (COMPTER_SCORES > 1)
-                    COMPUTER_WININGS++;
-                System.out.println("\tComputers Winings : " + COMPUTER_WININGS);
+            // If this was the second innings, display the final results
+            if (computerScore < target) {
+                System.out.println(playerName + " won the match!");
+                playerWins++;
             }
+            displayScores();
+            askToPlayAgain();
         }
-        System.out.println("\n\n_________________________________________________________\n\n");
-        System.out.println("Now That's " + player_name + "'s time to make runs ");
-
-        player_batting(COMPTER_SCORES);
     }
 
-    public void player_batting(int target_score_of_player) {
-        int PLAYER_SCORES = 0;
-        // Player -> batting
-        // Comp -> bolling
-        int target = target_score_of_player + 1;
-        int overs = 6;
-        int player_thrownRuns = 0, comp_thrownRuns = 0;
-        System.out.println("\n\n_________________________________________________________\n\n");
+    // Displays the scores after each game
+    private void displayScores() {
+        System.out.println("_________________________________________________________\n");
+        System.out.println("\n\n--- Game Over ---");
+        System.out.println(playerName + "'s total wins: " + playerWins);
+        System.out.println("Computer's total wins: " + computerWins);
+        System.out.println("_________________________________________________________\n");
+    }
 
-        if (target > 1) {
-            System.out.print("Target to match : " + target + '\n');
-        }
+    private void askToPlayAgain() {
+        System.out.print("Do you want to play another game? (yes/no): ");
+        String response = scanner.next().trim().toLowerCase();
 
-        System.out.println("It will be " + overs + " overs match\n\t\tHere You Goooo!!! ");
+        if (response.equals("yes") || response.equals("y")) {
+            setupMatch(); // Start a new match
+        } else if (response.equals("yes") || response.equals("y")) {
+            System.out.println("Thanks for playing!");
+            scanner.close(); // Close the scanner when done
 
-        int i;
-        for (i = 0; i <= 6 * overs; i++) {
-
-            comp_thrownRuns = computerRuns();
-            System.out.print("Enter your thrown(1 to 6) : ");
-            player_thrownRuns = scanner.nextInt();
-
-            System.out.println("Computer thrown Runs : " + comp_thrownRuns);
-            if (player_thrownRuns <= 6 && player_thrownRuns > 0) {
-                if (player_thrownRuns == comp_thrownRuns) {
-                    System.out.println("Thats a Wicket " + player_name + ", just out");
-                    System.out.println(player_name + ", Your Total Score : " + PLAYER_SCORES);
-                    break;
-                } else {
-                    PLAYER_SCORES += player_thrownRuns;
-                }
-
-                if (target > 1) {
-                    if (target <= PLAYER_SCORES) {
-                        break;
-                    }
-                }
-
-            } else {
-                System.out.println("\n\n_________________________________________________________");
-                System.out.println("\t***Error: Input Out of list***");
-                System.out.println("Entr again ");
-                System.out.println("_________________________________________________________");
-                i--;
-                continue;
-            }
-        }
-
-        if (i <= 6) {
-            System.out.println("\n\t****Match Just end !! ****  ");
         } else {
-            System.out.println(player_name + "'s, Your Total Score : " + PLAYER_SCORES);
-            if (PLAYER_SCORES >= target && target > 1) {
-                if (PLAYER_SCORES > 1)
-                    PLAYER_WININGS++;
-                System.out.println("\t" + player_name + "'s Winings : " + PLAYER_WININGS);
-            }
+            System.out.println("ErrorType : Invalid Choice !");
+            scanner.close(); // Close the scanner when done
         }
-
-        System.out.println("\n\n_________________________________________________________\n\n");
-        System.out.println("Now That's computer's time to make runs ");
-        comp_batting(PLAYER_SCORES);
     }
 
     public static void main(String[] args) {
-        main myObj = new main();
-
-        myObj.getPlayerInfo();
-        myObj.setupMatch();
+        main game = new main();
+        game.getPlayerInfo();
+        game.setupMatch();
     }
 }
