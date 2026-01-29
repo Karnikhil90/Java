@@ -1,57 +1,5 @@
-class Node {
 
-    private int data;
-    private Node left, right;
 
-    public Node(int data, Node left, Node right) {
-        this.data = data;
-        this.left = left;
-        this.right = right;
-    }
-
-    public Node(int data) {
-        this(data, null, null);
-    }
-    
-    public Node(Node root){
-        this(root.getData(), root.getLeft(), root.getRight());
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Node{");
-        sb.append("data=").append(data);
-        if (left != null) sb.append(", left=").append(left);
-        if (right != null) sb.append(", right=").append(right);
-        sb.append('}');
-        return sb.toString();
-    }
-
-    public int getData() {
-        return data;
-    }
-
-    public Node getLeft() {
-        return left;
-    }
-
-    public Node getRight() {
-        return right;
-    }
-
-    public void setData(int data) {
-        this.data = data;
-    }
-
-    public void setLeft(Node left) {
-        this.left = left;
-    }
-
-    public void setRight(Node right) {
-        this.right = right;
-    }
-}
 
 public class MyTree {
 
@@ -185,7 +133,7 @@ public class MyTree {
         from = new Node(to);
         to = temp;
     }
-    void swapChildren(Node parent) {
+    public void swapChildren(Node parent) {
         if (parent == null) return;
 
         Node temp = parent.getLeft();
@@ -194,7 +142,7 @@ public class MyTree {
     }
 
 
-    void mirror(Node root) {
+    public void mirror(Node root) {
         if (root == null) return;
 
         swapChildren(root);
@@ -202,4 +150,25 @@ public class MyTree {
         mirror(root.getRight());
     }
 
+    public Node copyNode(Node root){
+        return new Node(root);
+    }
+
+    public void nullToleft(){
+        System.out.println(root);
+        root.setLeft(null);
+        System.out.println(root);
+    }
+    public void nullToRight(){
+        System.out.println(root);
+        root.setRight(null);
+        System.out.println(root);
+    }
+
+    public boolean isIdentical(Node a , Node b){
+        if(a == null && b == null) return true;
+        if(a == null || b == null) return false;
+        if(a.getData() != b.getData()) return false;
+        return isIdentical(a.getLeft(), b.getLeft()) && isIdentical(a.getRight(), b.getRight());
+    }
 }

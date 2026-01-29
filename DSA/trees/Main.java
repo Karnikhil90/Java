@@ -22,6 +22,15 @@ public class Main {
         IO.println("========= Mirrored the Node =========");
         tree.preorder();
         // IO.println(tree);
-
+        IO.println("\n======================================");
+        tree.preorder();
+        IO.println("copy a new Node");
+        Node copynode = tree.copyNode(tree.root);
+        // tree.root.getLeft().setLeft(null);
+        tree.nullToleft();
+        tree.nullToRight();
+        tree.preorder(copynode);
+        // System.out.println(copynode);
+        IO.println("\n======================================");
     }
 }
